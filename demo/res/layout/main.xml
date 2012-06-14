@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2012, Florian Westreicher aka meredrica. All rights reserved.
+  Copyrights licensed under the Modified BSD License. See LICENSE.txt file for terms.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:meredrica="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <org.meredrica.android.ui.widgets.ExpandableLayout
+        android:id="@+id/expandable_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        meredrica:footer="@layout/footer"
+        meredrica:header="@layout/header"
+        meredrica:open="false" >
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/hello_world"/>
+    </org.meredrica.android.ui.widgets.ExpandableLayout>
+
+</LinearLayout>

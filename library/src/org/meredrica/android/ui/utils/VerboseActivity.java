@@ -1,8 +1,8 @@
 /**
- * Copyright (c) 2012, Florian Westreicher aka meredrica All rights reserved.
+ * Copyright (c) 2012, Florian Westreicher aka meredrica. All rights reserved.
  * Copyrights licensed under the Modified BSD License. See LICENSE.txt file for terms.
  */
-package org.meredrica.androidhelpers;
+package org.meredrica.android.ui.utils;
 
 import android.app.Activity;
 import android.app.Dialog;
