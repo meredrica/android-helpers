@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -24,10 +25,12 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 	private static final String TAG = ExpandableLayout.class.getSimpleName();
 	private View header;
 	private View footer;
-	private int headerId = -1;
-	private int footerId = -1;
-	private boolean open = true;
+	private boolean openState = true;
 	private OnOpenStateChangedListener onOpenStateChangedListener;
+	private View headerOpenView;
+	private View footerOpenView;
+	private View headerClosedView;
+	private View footerClosedView;
 
 	public ExpandableLayout(final Context context) {
 		super(context);
@@ -40,10 +43,20 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 		Log.d(TAG, "created  with attributes");
 		setOrientation(VERTICAL);
 		TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.ExpandableLayout);
-		headerId = attributes.getResourceId(R.styleable.ExpandableLayout_header, -1);
-		footerId = attributes.getResourceId(R.styleable.ExpandableLayout_footer, -1);
-		open = attributes.getBoolean(R.styleable.ExpandableLayout_open, true);
+		int headerOpenId = attributes.getResourceId(R.styleable.ExpandableLayout_header_open, -1);
+		int footerOpenId = attributes.getResourceId(R.styleable.ExpandableLayout_footer_open, -1);
+		int headerClosedId = attributes.getResourceId(R.styleable.ExpandableLayout_header_closed, -1);
+		int footerClosedId = attributes.getResourceId(R.styleable.ExpandableLayout_footer_closed, -1);
+		openState = attributes.getBoolean(R.styleable.ExpandableLayout_default_open, true);
 		attributes.recycle();
+		headerOpenView = headerOpenId != -1 ? inflate(getContext(), headerOpenId, null) : null;
+		if (headerOpenView == null) {
+			throw new InflateException("missing required attribute header_open");
+		}
+		setHeader(header); // we need this to set the header the first time.
+		footerOpenView = footerOpenId != -1 ? inflate(getContext(), footerOpenId, null) : null;
+		headerClosedView = headerClosedId != -1 ? inflate(getContext(), headerClosedId, null) : null;
+		footerClosedView = footerClosedId != -1 ? inflate(getContext(), footerClosedId, null) : null;
 	}
 
 	@Override
@@ -65,17 +78,8 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 	protected void onFinishInflate() {
 		super.onFinishInflate();
 		Log.d(TAG, "onfinishinflate");
-		createAndAddViews();
-	}
+		setOpenState(openState);
 
-	private void createAndAddViews() {
-		if (headerId != -1) {
-			setHeader(inflate(getContext(), headerId, null));
-		}
-		if (footerId != -1) {
-			setFooter(inflate(getContext(), footerId, null));
-		}
-		setOpenState(open);
 	}
 
 	/**
@@ -85,7 +89,7 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 	 *          The state to set. If true, all children will be set to visible.
 	 */
 	private void setOpenState(final boolean open) {
-		this.open = open;
+		openState = open;
 		int all = getChildCount();
 		all -= hasFooter() ? 1 : 0; // we do not want to hide the footer if we have one.
 		int start = hasHeader() ? 1 : 0; // if we do not have a header, we start at 0
@@ -96,24 +100,51 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 		if (onOpenStateChangedListener != null) {
 			onOpenStateChangedListener.onOpenStateChanged(this, open);
 		}
+		setHeader(open ? headerOpenView : headerClosedView);
+		setFooter(open ? footerOpenView : footerClosedView);
 	}
 
 	public boolean isOpen() {
-		return open;
+		return openState;
 	}
 
+	/**
+	 * Returns the currently used Header or null if there is none.
+	 * 
+	 * @return The header
+	 */
 	public View getHeader() {
 		return header;
 	}
 
+	public View getHeaderOpenView() {
+		return headerOpenView;
+	}
+
+	public void setHeaderOpenView(final View headerOpenView) {
+		this.headerOpenView = headerOpenView;
+	}
+
+	public View getHeaderClosedView() {
+		return headerClosedView;
+	}
+
+	public void setHeaderClosedView(final View headerClosedView) {
+		this.headerClosedView = headerClosedView;
+	}
+
 	/**
-	 * Sets a View as header. The view will automatically be set to clickable. If you pass null, the header is removed
-	 * instead.
+	 * Sets a View as header. The view will automatically be set to clickable and an {@link OnClickListener} will be set.
+	 * If you pass null, the old header is kept instead.
 	 * 
 	 * @param header
-	 *          The header to set or null to remove the header.
+	 *          The header to set.
 	 */
-	public void setHeader(final View header) {
+	protected void setHeader(final View header) {
+		if (header == null) {
+			// not having a header defeats the whole purpose of this widget, so we do not allow it.
+			return;
+		}
 		if (hasHeader()) {
 			removeView(getHeader());
 		}
@@ -133,7 +164,29 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 		return footer;
 	}
 
-	public void setFooter(final View footer) {
+	public View getFooterOpenView() {
+		return footerOpenView;
+	}
+
+	public void setFooterOpenView(final View footerOpenView) {
+		this.footerOpenView = footerOpenView;
+	}
+
+	public View getFooterClosedView() {
+		return footerClosedView;
+	}
+
+	public void setFooterClosedView(final View footerClosedView) {
+		this.footerClosedView = footerClosedView;
+	}
+
+	/**
+	 * Sets a View as footer. If you pass null, the footer is removed instead.
+	 * 
+	 * @param footer
+	 *          The footer to set or null to remove the footer.
+	 */
+	protected void setFooter(final View footer) {
 		if (hasFooter()) {
 			removeView(getFooter());
 		}

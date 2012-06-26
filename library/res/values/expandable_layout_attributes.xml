@@ -6,9 +6,11 @@
 <resources>
 
     <declare-styleable name="ExpandableLayout">
-        <attr name="header" format="reference" />
-        <attr name="footer" format="reference" />
-        <attr name="open" format="boolean" />
+        <attr name="header_open" format="reference" />
+        <attr name="header_closed" format="reference" />
+        <attr name="footer_open" format="reference" />
+        <attr name="footer_closed" format="reference" />
+        <attr name="default_open" format="boolean" />
     </declare-styleable>
 
 </resources>
