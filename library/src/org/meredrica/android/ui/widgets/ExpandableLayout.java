@@ -55,8 +55,18 @@ public class ExpandableLayout extends LinearLayout implements View.OnClickListen
 		}
 		setHeader(header); // we need this to set the header the first time.
 		footerOpenView = footerOpenId != -1 ? inflate(getContext(), footerOpenId, null) : null;
-		headerClosedView = headerClosedId != -1 ? inflate(getContext(), headerClosedId, null) : null;
-		footerClosedView = footerClosedId != -1 ? inflate(getContext(), footerClosedId, null) : null;
+		if (headerOpenId == headerClosedId) {
+			// save some RAM
+			headerClosedView = headerOpenView;
+		} else {
+			headerClosedView = headerClosedId != -1 ? inflate(getContext(), headerClosedId, null) : null;
+		}
+		if (footerClosedId == footerOpenId) {
+			// save some RAM
+			footerClosedView = footerOpenView;
+		} else {
+			footerClosedView = footerClosedId != -1 ? inflate(getContext(), footerClosedId, null) : null;
+		}
 	}
 
 	@Override
